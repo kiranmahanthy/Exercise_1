@@ -67,6 +67,15 @@
       </label>
     </section>
 
+    <section class="panel">
+      <h2>Manage Stored Data</h2>
+      <div>
+        <button id="clear-recent-prices" type="button">Clear recent prices</button>
+        <button id="clear-custom-products" type="button">Clear custom products</button>
+      </div>
+      <div class="help-text">Clearing custom products removes only user-added entries; built-in defaults stay.</div>
+    </section>
+
     <section class="panel summary-panel">
       <h2>Pricing Summary</h2>
       <div class="summary-grid">
@@ -79,6 +88,16 @@
       </div>
     </section>
   </main>
+  <div id="confirm-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <div class="modal-message" id="confirm-modal-message">Are you sure?</div>
+      <div class="modal-actions">
+        <button id="confirm-modal-cancel" type="button">Cancel</button>
+        <button id="confirm-modal-confirm" type="button">Confirm</button>
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

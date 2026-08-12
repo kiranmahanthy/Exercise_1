@@ -1,7 +1,7 @@
 const order = {
   items: [
-    { name: 'Wireless Mouse', category: 'electronics', price: 29.99, quantity: 1 },
-    { name: 'Coffee Mug', category: 'kitchen', price: 12.5, quantity: 2 }
+    { name: 'Wireless Mouse', category: 'electronics', price: 0, quantity: 0 },
+    { name: 'Coffee Mug', category: 'kitchen', price: 0, quantity: 0 }
   ],
   coupon: {
     type: 'percent',
@@ -14,6 +14,29 @@ const order = {
     loyaltyPoints: 0
   }
 };
+
+const CATEGORIES = [
+  'electronics',
+  'kitchen',
+  'books',
+  'clothing',
+  'home',
+  'beauty'
+];
+
+const PRODUCTS_BY_CATEGORY = {
+  electronics: ['Wireless Mouse', 'Keyboard', 'USB-C Cable', 'Headphones'],
+  kitchen: ['Coffee Mug', 'Plate Set', 'Knife Set', 'Cutting Board'],
+  books: ['Novel A', 'Novel B', 'Cookbook'],
+  clothing: ['T-Shirt', 'Jeans', 'Socks'],
+  home: ['Cushion', 'Lamp', 'Blanket'],
+  beauty: ['Lipstick', 'Moisturizer']
+};
+
+const DEFAULT_PRODUCTS = JSON.parse(JSON.stringify(PRODUCTS_BY_CATEGORY));
+
+const PRICE_PRESETS = [0, 5, 10, 15, 20, 25, 50, 100];
+const RECENT_PRICES = [];
 
 const elements = {
   itemsTableBody: document.querySelector('#items-table tbody'),
@@ -35,7 +58,132 @@ const elements = {
   summaryTax: document.querySelector('#summary-tax'),
   summaryLoyalty: document.querySelector('#summary-loyalty'),
   summaryTotal: document.querySelector('#summary-total')
+  ,clearRecentPrices: document.querySelector('#clear-recent-prices')
+  ,clearCustomProducts: document.querySelector('#clear-custom-products')
+  ,confirmModal: document.querySelector('#confirm-modal')
+  ,confirmModalMessage: document.querySelector('#confirm-modal-message')
+  ,confirmModalConfirm: document.querySelector('#confirm-modal-confirm')
+  ,confirmModalCancel: document.querySelector('#confirm-modal-cancel')
 };
+
+function loadProducts() {
+  try {
+    const raw = localStorage.getItem('products_by_category');
+    if (!raw) return;
+    const stored = JSON.parse(raw);
+    Object.keys(stored).forEach((k) => {
+      if (!Array.isArray(stored[k])) return;
+      if (!PRODUCTS_BY_CATEGORY[k]) PRODUCTS_BY_CATEGORY[k] = [];
+      PRODUCTS_BY_CATEGORY[k] = Array.from(new Set([...PRODUCTS_BY_CATEGORY[k], ...stored[k]]));
+    });
+  } catch (e) {
+    console.warn('Failed to load products_by_category from localStorage', e);
+  }
+}
+
+function saveProducts() {
+  try {
+    localStorage.setItem('products_by_category', JSON.stringify(PRODUCTS_BY_CATEGORY));
+  } catch (e) {
+    console.warn('Failed to save products_by_category to localStorage', e);
+  }
+}
+
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const modal = elements.confirmModal;
+    if (!modal) {
+      // fallback to native confirm
+      resolve(window.confirm(message));
+      return;
+    }
+    const msg = elements.confirmModalMessage;
+    const btnConfirm = elements.confirmModalConfirm;
+    const btnCancel = elements.confirmModalCancel;
+
+    const cleanup = () => {
+      modal.classList.remove('visible');
+      document.removeEventListener('keydown', onKey);
+      btnConfirm.removeEventListener('click', onConfirm);
+      btnCancel.removeEventListener('click', onCancel);
+    };
+
+    const onConfirm = () => {
+      cleanup();
+      resolve(true);
+    };
+
+    const onCancel = () => {
+      cleanup();
+      resolve(false);
+    };
+
+    const onKey = (e) => {
+      if (e.key === 'Escape') onCancel();
+      if (e.key === 'Enter') onConfirm();
+    };
+
+    msg.textContent = message;
+    modal.classList.add('visible');
+    btnConfirm.addEventListener('click', onConfirm);
+    btnCancel.addEventListener('click', onCancel);
+    // small timeout to allow listeners to attach before focus
+    setTimeout(() => btnConfirm.focus(), 10);
+    document.addEventListener('keydown', onKey);
+  });
+}
+
+async function clearRecentPrices() {
+  const ok = await showConfirm('Clear recent prices? This action cannot be undone.');
+  if (!ok) return;
+  RECENT_PRICES.length = 0;
+  saveRecentPrices();
+  // re-render items to update price selects
+  renderItems();
+  updateSummary();
+}
+
+async function clearCustomProducts() {
+  const ok = await showConfirm('Clear custom products? Built-in products will remain. This will remove user-added entries and cannot be undone.');
+  if (!ok) return;
+  try {
+    // remove stored custom products
+    localStorage.removeItem('products_by_category');
+    // reset in-memory to defaults
+    Object.keys(PRODUCTS_BY_CATEGORY).forEach((k) => delete PRODUCTS_BY_CATEGORY[k]);
+    Object.keys(DEFAULT_PRODUCTS).forEach((k) => {
+      PRODUCTS_BY_CATEGORY[k] = Array.from(DEFAULT_PRODUCTS[k]);
+    });
+    renderItems();
+    updateSummary();
+  } catch (e) {
+    console.warn('Failed to clear custom products', e);
+  }
+}
+
+function loadRecentPrices() {
+  try {
+    const raw = localStorage.getItem('recent_prices');
+    if (!raw) return;
+    const stored = JSON.parse(raw);
+    if (!Array.isArray(stored)) return;
+    stored.forEach((p) => {
+      const n = Number(p);
+      if (!Number.isNaN(n)) RECENT_PRICES.push(n);
+    });
+  } catch (e) {
+    console.warn('Failed to load recent_prices from localStorage', e);
+  }
+}
+
+function saveRecentPrices() {
+  try {
+    const unique = Array.from(new Set(RECENT_PRICES)).slice(0, 10);
+    localStorage.setItem('recent_prices', JSON.stringify(unique));
+  } catch (e) {
+    console.warn('Failed to save recent_prices to localStorage', e);
+  }
+}
 
 const roundMoney = (value) => Math.round((value + Number.EPSILON) * 100) / 100;
 
@@ -166,6 +314,46 @@ function renderItems() {
       return td;
     };
 
+    const createSelect = (options, value, onChange, fieldId) => {
+      const select = document.createElement('select');
+      select.dataset.fieldId = fieldId;
+      select.dataset.itemIndex = index;
+      const empty = document.createElement('option');
+      empty.value = '';
+      empty.textContent = '--';
+      select.appendChild(empty);
+      options.forEach((opt) => {
+        const o = document.createElement('option');
+        o.value = typeof opt === 'string' ? opt : opt.value;
+        o.textContent = typeof opt === 'string' ? opt : opt.label;
+        if (String(o.value) === String(value)) o.selected = true;
+        select.appendChild(o);
+      });
+      // add an Other option to allow freeform product names
+      const otherOpt = document.createElement('option');
+      otherOpt.value = '__other__';
+      otherOpt.textContent = 'Other...';
+      if (value && options.indexOf(value) === -1) {
+        // if current value is not in options, we'll default to showing an input instead of selecting Other here
+      } else {
+        select.appendChild(otherOpt);
+      }
+      select.addEventListener('change', (event) => {
+        if (event.target.value === '__other__') {
+          const input = createInput('text', '', (e) => {
+            order.items[index].name = e.target.value;
+            updateSummary();
+          }, fieldId);
+          event.target.replaceWith(input);
+          input.focus();
+          order.items[index].name = '';
+          return;
+        }
+        onChange(event);
+      });
+      return select;
+    };
+
     const createInput = (type, value, onChange, fieldId) => {
       const input = document.createElement('input');
       input.type = type;
@@ -173,31 +361,190 @@ function renderItems() {
       input.dataset.fieldId = fieldId;
       input.dataset.itemIndex = index;
       input.addEventListener('input', onChange);
+
+      if (fieldId === 'name') {
+        input.addEventListener('blur', (e) => {
+          const val = String(e.target.value || '').trim();
+          if (!val) return;
+          const cat = order.items[index].category || 'uncategorized';
+          if (!PRODUCTS_BY_CATEGORY[cat]) PRODUCTS_BY_CATEGORY[cat] = [];
+          if (!PRODUCTS_BY_CATEGORY[cat].includes(val)) {
+            PRODUCTS_BY_CATEGORY[cat].push(val);
+            saveProducts();
+          }
+          const select = createSelect(PRODUCTS_BY_CATEGORY[cat], val, (ev) => {
+            order.items[index].name = ev.target.value;
+            updateSummary();
+          }, 'name');
+          input.replaceWith(select);
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') e.target.blur();
+        });
+      }
+
+      if (fieldId === 'price') {
+        input.addEventListener('blur', (e) => {
+          const raw = e.target.value;
+          const n = Number(raw);
+          if (Number.isNaN(n)) return;
+          // add to recent prices at front, keep unique and max 10
+          const idx = RECENT_PRICES.indexOf(n);
+          if (idx !== -1) RECENT_PRICES.splice(idx, 1);
+          RECENT_PRICES.unshift(n);
+          if (RECENT_PRICES.length > 10) RECENT_PRICES.splice(10);
+          saveRecentPrices();
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') e.target.blur();
+        });
+      }
+
       return input;
     };
 
-    const nameInput = createInput('text', item.name, (event) => {
-      order.items[index].name = event.target.value;
-      updateSummary();
-    }, 'name');
+    const createPriceControl = (value, onChange) => {
+      const presets = PRICE_PRESETS;
+      const numericValue = value === '' || value === null ? '' : Number(value);
+      const inPresets = presets.includes(numericValue);
+      const inRecent = RECENT_PRICES.includes(numericValue);
+      if (!inPresets && !inRecent && numericValue !== '' && !Number.isNaN(numericValue)) {
+        return createInput('number', numericValue, onChange, 'price');
+      }
 
-    const categoryInput = createInput('text', item.category, (event) => {
-      order.items[index].category = event.target.value;
-      updateSummary();
-    }, 'category');
+      const select = document.createElement('select');
+      select.dataset.fieldId = 'price';
+      select.dataset.itemIndex = index;
+      const empty = document.createElement('option');
+      empty.value = '';
+      empty.textContent = '--';
+      select.appendChild(empty);
+      // include recent prices first
+      const added = new Set();
+      RECENT_PRICES.forEach((p) => {
+        if (added.has(p)) return;
+        const o = document.createElement('option');
+        o.value = p;
+        o.textContent = `$${p}`;
+        if (p === numericValue) o.selected = true;
+        select.appendChild(o);
+        added.add(p);
+      });
+      // then presets (skip duplicates)
+      presets.forEach((p) => {
+        if (added.has(p)) return;
+        const o = document.createElement('option');
+        o.value = p;
+        o.textContent = `$${p}`;
+        if (p === numericValue) o.selected = true;
+        select.appendChild(o);
+        added.add(p);
+      });
+      const other = document.createElement('option');
+      other.value = '__other__';
+      other.textContent = 'Other...';
+      select.appendChild(other);
+      select.addEventListener('change', (event) => {
+        if (event.target.value === '__other__') {
+          const input = createInput('number', numericValue || 0, (e) => {
+            onChange(e);
+          }, 'price');
+          event.target.replaceWith(input);
+          input.focus();
+          return;
+        }
+        // synthetic event shape expected by existing handlers
+        const synthetic = { target: { value: parseFloat(event.target.value) } };
+        onChange(synthetic);
+      });
+      return select;
+    };
 
-    const priceInput = createInput('number', item.price, (event) => {
+    const availableProducts = PRODUCTS_BY_CATEGORY[item.category] || Object.values(PRODUCTS_BY_CATEGORY).flat();
+    let nameInput;
+    if (item.name && availableProducts.indexOf(item.name) === -1) {
+      // render a freeform input when the saved product isn't in the list
+      nameInput = createInput('text', item.name, (event) => {
+        order.items[index].name = event.target.value;
+        updateSummary();
+      }, 'name');
+    } else {
+      nameInput = createSelect(
+        availableProducts,
+        item.name,
+        (event) => {
+          order.items[index].name = event.target.value;
+          updateSummary();
+        },
+        'name'
+      );
+    }
+
+    const categoryInput = createSelect(
+      CATEGORIES,
+      item.category,
+      (event) => {
+        const newCat = event.target.value;
+        order.items[index].category = newCat;
+        // update the product select options for this row
+        const productElem = document.querySelector(`[data-field-id="name"][data-item-index="${index}"]`);
+        const currentProduct = order.items[index].name;
+        const opts = PRODUCTS_BY_CATEGORY[newCat] || Object.values(PRODUCTS_BY_CATEGORY).flat();
+        if (productElem) {
+          if (productElem.tagName === 'SELECT') {
+            // rebuild options
+            productElem.innerHTML = '';
+            const empty = document.createElement('option');
+            empty.value = '';
+            empty.textContent = '--';
+            productElem.appendChild(empty);
+            opts.forEach((p) => {
+              const o = document.createElement('option');
+              o.value = p;
+              o.textContent = p;
+              if (p === currentProduct) o.selected = true;
+              productElem.appendChild(o);
+            });
+            const other = document.createElement('option');
+            other.value = '__other__';
+            other.textContent = 'Other...';
+            productElem.appendChild(other);
+            if (!opts.includes(currentProduct) && currentProduct) {
+              // switch to a freeform input to preserve the current custom product
+              const input = createInput('text', currentProduct, (e) => {
+                order.items[index].name = e.target.value;
+                updateSummary();
+              }, 'name');
+              productElem.replaceWith(input);
+            }
+          } else if (productElem.tagName === 'INPUT') {
+            // if input exists but now the product matches an option, convert back to select
+            if (opts.includes(currentProduct) || currentProduct === '') {
+              const select = createSelect(opts, currentProduct, (event) => {
+                order.items[index].name = event.target.value;
+                updateSummary();
+              }, 'name');
+              productElem.replaceWith(select);
+            }
+          }
+        }
+        updateSummary();
+      },
+      'category'
+    );
+
+    const priceInput = createPriceControl(item.price, (event) => {
       order.items[index].price = parseFloat(event.target.value);
       if (Number.isNaN(order.items[index].price)) {
         order.items[index].price = -1;
       }
       updateSummary();
-    }, 'price');
+    });
 
     const quantityInput = createInput('number', item.quantity, (event) => {
       order.items[index].quantity = parseInt(event.target.value, 10);
       if (Number.isNaN(order.items[index].quantity)) {
-        order.items[index].quantity = -1;
+        order.items[index].quantity = 0;
       }
       updateSummary();
     }, 'quantity');
@@ -243,7 +590,7 @@ function renderValidationErrors(errors) {
 
   errors.forEach((error) => {
     if (error.field === 'name' || error.field === 'category' || error.field === 'price' || error.field === 'quantity') {
-      const selector = `input[data-field-id="${error.field}"][data-item-index="${error.index}"]`;
+      const selector = `input[data-field-id="${error.field}"][data-item-index="${error.index}"],select[data-field-id="${error.field}"][data-item-index="${error.index}"]`;
       const input = document.querySelector(selector);
       if (input) input.classList.add('input-error');
       return;
@@ -307,7 +654,7 @@ function setupEventListeners() {
       return;
     }
 
-    order.items.push({ name: 'New Item', category: '', price: 0, quantity: 1 });
+    order.items.push({ name: '', category: '', price: 0, quantity: 1 });
     renderItems();
     updateSummary();
   });
@@ -320,9 +667,14 @@ function setupEventListeners() {
     elements.isMember,
     elements.loyaltyPoints
   ].forEach((element) => element.addEventListener('input', updateSummary));
+
+  if (elements.clearRecentPrices) elements.clearRecentPrices.addEventListener('click', clearRecentPrices);
+  if (elements.clearCustomProducts) elements.clearCustomProducts.addEventListener('click', clearCustomProducts);
 }
 
 function initialize() {
+  loadProducts();
+  loadRecentPrices();
   renderItems();
   setupEventListeners();
   updateSummary();
