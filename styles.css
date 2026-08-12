@@ -1,0 +1,150 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, system-ui, sans-serif;
+  background: #f5f7fb;
+  color: #17233d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 24px;
+}
+
+main {
+  width: min(960px, 100%);
+}
+
+h1,
+h2 {
+  margin: 0 0 16px;
+}
+
+.panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+thead th {
+  text-align: left;
+  padding: 12px 8px;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+tbody tr {
+  border-top: 1px solid #e2e8f0;
+}
+
+tbody td {
+  padding: 10px 8px;
+  vertical-align: middle;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #f8fafc;
+  font: inherit;
+}
+
+.field-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error-text {
+  color: #c53030;
+  font-size: 0.85rem;
+  min-height: 1.2em;
+}
+
+.input-error {
+  border-color: #c53030;
+  background: #fff5f5;
+}
+
+.error-list {
+  display: none;
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #f8d7da;
+  color: #842029;
+  border: 1px solid #f5c2c7;
+}
+
+.error-list.visible {
+  display: block;
+}
+
+button,
+button[type="button"] {
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #2d8cf0;
+  color: white;
+  padding: 11px 18px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background: #1f6fcc;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px 20px;
+  align-items: center;
+}
+
+.total-label {
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.total-value {
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 16px;
+  }
+
+  table,
+  input,
+  select,
+  button {
+    font-size: 0.95rem;
+  }
+}

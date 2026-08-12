@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Pricing Calculator</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <h1>Order Pricing Calculator</h1>
+
+    <section class="panel">
+      <h2>Items</h2>
+      <table id="items-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button id="add-item">Add Item</button>
+    </section>
+
+    <div id="global-errors" class="error-list" aria-live="polite"></div>
+
+    <section class="panel">
+      <h2>Coupon</h2>
+      <label>
+        Coupon type
+        <select id="coupon-type">
+          <option value="percent">Percent</option>
+          <option value="fixed">Fixed</option>
+        </select>
+      </label>
+      <label>
+        Value
+        <input id="coupon-value" type="number" min="0" step="0.01" value="10" />
+        <span class="error-text" id="coupon-value-error"></span>
+      </label>
+      <label>
+        Min subtotal
+        <input id="coupon-min-subtotal" type="number" min="0" step="0.01" value="0" />
+        <span class="error-text" id="coupon-min-subtotal-error"></span>
+      </label>
+      <label>
+        Categories (comma-separated)
+        <input id="coupon-categories" type="text" placeholder="e.g. electronics,home" />
+        <span class="error-text" id="coupon-categories-error"></span>
+      </label>
+    </section>
+
+    <section class="panel">
+      <h2>Customer</h2>
+      <label class="checkbox-label">
+        <input id="is-member" type="checkbox" /> Member (additional 5% off after coupon)
+      </label>
+      <label>
+        Loyalty points
+        <input id="loyalty-points" type="number" min="0" step="1" value="0" />
+        <span class="error-text" id="loyalty-points-error"></span>
+      </label>
+    </section>
+
+    <section class="panel summary-panel">
+      <h2>Pricing Summary</h2>
+      <div class="summary-grid">
+        <div>Subtotal</div><div id="summary-subtotal">$0.00</div>
+        <div>Coupon discount</div><div id="summary-coupon">-$0.00</div>
+        <div>Member discount</div><div id="summary-member">-$0.00</div>
+        <div>Tax (8%)</div><div id="summary-tax">$0.00</div>
+        <div>Loyalty redemption</div><div id="summary-loyalty">-$0.00</div>
+        <div class="total-label">Total</div><div class="total-value" id="summary-total">$0.00</div>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
