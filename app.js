@@ -202,8 +202,8 @@ function renderItems() {
       updateSummary();
     }, 'quantity');
 
-    row.appendChild(cell(nameInput));
     row.appendChild(cell(categoryInput));
+    row.appendChild(cell(nameInput));
     row.appendChild(cell(priceInput));
     row.appendChild(cell(quantityInput));
 
