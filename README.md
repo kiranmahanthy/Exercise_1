@@ -1,73 +1,74 @@
 # Order Pricing Calculator
 
-A small static web app for interactively building an order and computing pricing with coupons, membership discounts, tax, and loyalty redemption.
+A static pricing calculator and checkout simulation for applying coupon logic, membership discounts, tax, and loyalty redemption.
 
-## What's new
-- Columns swapped: the table shows **Category** first, then **Product**.
-- Category and Product are selectable lists (select controls) instead of freeform text.
-- Products list includes an **Other...** option that opens a freeform input; custom products are persisted to localStorage per category.
-- Price control supports preset values, a recent-prices list (persisted), and an **Other...** numeric input for custom prices.
-- New buttons to clear stored recent prices and custom products (with confirmation modal).
+## Overview
+This project includes:
+- a browser-based pricing calculator in [index.html](index.html)
+- the pricing logic and UI behavior in [app.js](app.js)
+- automated Jest test coverage in [checkout.spec.ts](checkout.spec.ts)
+- generated validation artifacts in the [test-reports](test-reports) folder
 
 ## Features
-- Add/remove items and set Category, Product, Price, Quantity per row.
-- Coupon support: percent/fixed, min subtotal, and category-restricted coupons.
-- Customer options: membership (extra 5% after coupon) and loyalty points redemption.
-- Validation with inline error markers and a global error list.
-- Persisted data: user-added products (`products_by_category`) and recent prices (`recent_prices`) are saved to `localStorage`.
+- Add and remove order items with category, product, price, and quantity
+- Apply percent or fixed coupons
+- Support minimum subtotal rules and category restrictions
+- Apply member discount after coupon logic
+- Apply loyalty-point redemption after tax
+- Validate calculated totals and rounding behavior
+- Persist custom product and recent price data in browser local storage
 
-## How to use
-1. Open `index.html` in a browser.
-2. Items
-	- Click `Add Item` to append a new row (new rows start with empty Category/Product and Price/Quantity = 0).
-	- Select a `Category` from the list.
-	- Select a `Product` from the Product list for that category.
-	  - Choose `Other...` to type a freeform product name. When you blur or press Enter the custom product is saved to the current category and converted into a selectable entry.
-	- Choose a `Price` from the presets or recent prices. Select `Other...` to type a numeric price directly. Custom prices are saved to a recent list on blur/Enter.
-	- Enter `Quantity` (integer).
-3. Coupon
-	- Select coupon `type` (`percent` or `fixed`), set the `Value`, optional `Min subtotal`, and optional comma-separated `Categories` (only these categories are eligible for percent coupons).
-4. Customer
-	- Toggle `Member` for the 5% member discount applied after coupons.
-	- Enter `Loyalty points` (100 points = $1 redemption applied after tax).
-5. Clearing stored data
-	- Use `Clear recent prices` to remove the recent price list (confirmation required).
-	- Use `Clear custom products` to remove user-added products (confirmation required). Built-in default products are preserved.
+## Local execution
+This project runs without Docker.
 
-## Data persistence
-- Custom products are stored in `localStorage` under the key `products_by_category`.
-- Recent custom prices are stored under `recent_prices`.
-- Clearing these is available in the UI (with confirmation). To manually clear them, open your browser devtools and remove those keys from `localStorage`.
+### Prerequisites
+- Node.js and npm installed
 
-## Files
-- `index.html` — UI and modal markup
-- `styles.css` — styling (includes modal styling)
-- `app.js` — application logic: rendering, validation, pricing, persistence
+### Install dependencies
+```bash
+npm install
+```
 
-## Development / Notes
-- This is a static app — open `index.html` in any modern browser.
-- The app falls back to native `confirm()` if the in-app modal can't be found.
-- If you want custom behavior (e.g., server persistence, export/import of lists, or different default product/price sets), tell me and I can implement it.
+### Run the tests
+```bash
+npm test -- --runInBand
+```
 
-Enjoy — the README now includes example flows and screenshot placeholders.
+### Open the app
+Open [index.html](index.html) directly in a browser.
 
-## Example flows
+## Test automation
+The verification suite is implemented in [checkout.spec.ts](checkout.spec.ts) and uses Jest with TypeScript support.
 
-1) Quick checkout with a percent coupon (category-restricted)
-	- Add two items: select Category `electronics` and Product `Wireless Mouse`, Price `$50`, Quantity `1`.
-	- Add second item: Category `kitchen`, Product `Coffee Mug`, Price `$10`, Quantity `2`.
-	- Coupon: `percent`, Value `10`, Min subtotal `0`, Categories set to `electronics`.
-	- Result: coupon discount applies only to the electronics line; member discount and tax apply afterwards. Verify `Subtotal`, `Coupon discount`, `Member discount`, `Tax`, and `Total` values in the Pricing Summary.
+Current status:
+- 1 test suite passed
+- 10 tests passed
+- 0 failed
 
-2) Add a custom product and custom price
-	- Add item, select `Category` then choose `Product` → `Other...` and type `Handmade Vase`, press Enter (or blur). The product is saved to that category and becomes selectable next time.
-	- For `Price` choose `Other...` and enter `37.5`, press Enter. The price is saved to the recent prices list and will appear in the top of the price selector.
-	- Verify the custom product appears after reload (persisted via `localStorage`) and recent price appears in the Price select.
+## Generated reports
+The project generates test and QA artifacts under [test-reports](test-reports):
+- junit.xml — JUnit XML result file
+- junit-web-report.html — browser-friendly HTML summary
+- test-case-master-workbook.xlsx — readable Excel workbook with one row per test step
+- QA and sign-off documents are also stored there when generated
 
-## Screenshots
+## Project structure
+- [app.js](app.js) — pricing logic, browser initialization, and persistence handling
+- [checkout.spec.ts](checkout.spec.ts) — automated test cases
+- [index.html](index.html) — UI markup
+- [styles.css](styles.css) — styling and layout
+- [jest.config.cjs](jest.config.cjs) — Jest configuration
+- [package.json](package.json) — scripts and dependencies
+- [tsconfig.json](tsconfig.json) — TypeScript compiler settings
 
-If you want visual documentation, add images into a `screenshots/` folder and reference them here. Suggested files:
-- `screenshots/flow-percent-coupon.png` — Pricing summary with percent coupon applied.
-- `screenshots/flow-custom-product.png` — Adding a custom product and price.
+## Notes
+- Docker support was removed from the workflow because the project is validated locally with Jest.
+- The app is intentionally static and does not require a backend server.
+- All browser-state persistence is stored in localStorage, which keeps custom products and recent prices available across sessions.
 
-You can include them in this README using standard Markdown image syntax after adding the files.
+## Example user flow
+1. Add an item with category and product selection.
+2. Choose a price and quantity.
+3. Configure coupon, member status, and loyalty points.
+4. Review the pricing summary for subtotal, discounts, tax, and total.
+5. Validate the result against the expected values in the automated tests.
