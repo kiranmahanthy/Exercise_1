@@ -1,0 +1,44 @@
+# QA Sign-off Sheet
+
+## Project Information
+- Project Name: Checkout Pricing Specification
+- Version / Build: 1.0
+- Date: 2026-08-13
+- Environment: Local Node/Jest execution
+- Tester: Automated QA run
+
+## Test Summary
+| Field | Value |
+|---|---|
+| Total Test Cases | 10 |
+| Passed | 10 |
+| Failed | 0 |
+| Blockers | 0 |
+| Status | PASS |
+
+## Test Approval
+| Field | Value |
+|---|---|
+| QA Status | Approved |
+| Reviewer | QA Automation |
+| Approval Date | 2026-08-13 |
+| Release Recommendation | Ready for sign-off |
+
+## Test Case Log
+
+| Test Case | Actual | Expected | Result | Defect ID |
+|---|---|---|---|---|
+| subtotal = sum(price * quantity) and no other rules | subtotal=25.00, coupon=0.00, member=0.00, tax=2.00, total=27.00 | subtotal=25.00, coupon=0.00, member=0.00, tax=2.00, total=27.00 | PASS | - |
+| percent coupon applies to whole order when categories empty | coupon=5.00, tax=3.60, total=48.60 | coupon=5.00, tax=3.60, total=48.60 | PASS | - |
+| percent coupon with categories applies only to matching items | coupon=10.00, tax=11.20, total=151.20 | coupon=10.00, tax=11.20, total=151.20 | PASS | - |
+| coupon only applies if subtotal >= minSubtotal | coupon=0.00, tax=3.92, total=52.92 | coupon=0.00, tax=3.92, total=52.92 | PASS | - |
+| fixed coupon subtracts from running total but never below 0 | coupon=30.00, tax=0.00, total=0.00 | coupon=30.00, tax=0.00, total=0.00 | PASS | - |
+| member discount (5%) applies after coupon | member=9.50, tax=14.44, total=194.94 | member=9.50, tax=14.44, total=194.94 | PASS | - |
+| tax of 8% applied after coupon + member discount | tax=6.84, total=92.34 | tax=6.84, total=92.34 | PASS | - |
+| loyalty redemption applies last (100 points = $1) and cannot reduce below zero | loyalty=6.00, total=48.00 | loyalty=6.00, total=48.00 | PASS | - |
+| rounding to 2 decimals is enforced | subtotal=10.33, tax=0.83, total=11.16 | subtotal=10.33, tax=0.83, total=11.16 | PASS | - |
+| complex combined scenario runs rules in exact order | subtotal=368.47, coupon=51.00, member=15.87, tax=24.13, loyalty=2.50, total=323.23 | subtotal=368.47, coupon=51.00, member=15.87, tax=24.13, loyalty=2.50, total=323.23 | PASS | - |
+
+## Final Sign-off
+- QA Sign-off: Approved
+- Comments: All checkout pricing scenarios met expected business logic and passed automated validation.

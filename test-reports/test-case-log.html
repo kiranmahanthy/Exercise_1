@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout Test Case Log</title>
+    <style>
+      body { font-family: Arial, sans-serif; background: #f6f8fb; color: #1f2937; margin: 0; }
+      .container { max-width: 1200px; margin: 32px auto; padding: 0 20px 40px; }
+      h1 { margin-bottom: 8px; }
+      .subtitle { color: #586174; margin-bottom: 20px; }
+      table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #dfe7f5; border-radius: 10px; overflow: hidden; }
+      th, td { border-bottom: 1px solid #e5e7eb; padding: 12px 14px; text-align: left; vertical-align: top; }
+      th { background: #eef3ff; }
+      .pass { color: #0f7a39; font-weight: bold; }
+      .fail { color: #b42318; font-weight: bold; }
+      .status { white-space: nowrap; }
+      code { background: #f3f4f6; padding: 2px 6px; border-radius: 4px; }
+      .section { margin-top: 18px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Checkout Pricing Test Cases</h1>
+      <div class="subtitle">Traditional test log with Actual, Expected, and Result values.</div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Test Case</th>
+            <th>Actual</th>
+            <th>Expected</th>
+            <th>Result</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>subtotal = sum(price * quantity) and no other rules</td>
+            <td>subtotal=25.00, coupon=0.00, member=0.00, tax=2.00, total=27.00</td>
+            <td>subtotal=25.00, coupon=0.00, member=0.00, tax=2.00, total=27.00</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>percent coupon applies to whole order when categories empty</td>
+            <td>coupon=5.00, tax=3.60, total=48.60</td>
+            <td>coupon=5.00, tax=3.60, total=48.60</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>percent coupon with categories applies only to matching items</td>
+            <td>coupon=10.00, tax=11.20, total=151.20</td>
+            <td>coupon=10.00, tax=11.20, total=151.20</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>coupon only applies if subtotal >= minSubtotal</td>
+            <td>coupon=0.00, tax=3.92, total=52.92</td>
+            <td>coupon=0.00, tax=3.92, total=52.92</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>fixed coupon subtracts from running total but never below 0</td>
+            <td>coupon=30.00, tax=0.00, total=0.00</td>
+            <td>coupon=30.00, tax=0.00, total=0.00</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>member discount (5%) applies after coupon</td>
+            <td>member=9.50, tax=14.44, total=194.94</td>
+            <td>member=9.50, tax=14.44, total=194.94</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>tax of 8% applied after coupon + member discount</td>
+            <td>tax=6.84, total=92.34</td>
+            <td>tax=6.84, total=92.34</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>loyalty redemption applies last (100 points = $1) and cannot reduce below zero</td>
+            <td>loyalty=6.00, total=48.00</td>
+            <td>loyalty=6.00, total=48.00</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>rounding to 2 decimals is enforced</td>
+            <td>subtotal=10.33, tax=0.83, total=11.16</td>
+            <td>subtotal=10.33, tax=0.83, total=11.16</td>
+            <td class="status pass">PASS</td>
+          </tr>
+          <tr>
+            <td>complex combined scenario runs rules in exact order</td>
+            <td>subtotal=368.47, coupon=51.00, member=15.87, tax=24.13, loyalty=2.50, total=323.23</td>
+            <td>subtotal=368.47, coupon=51.00, member=15.87, tax=24.13, loyalty=2.50, total=323.23</td>
+            <td class="status pass">PASS</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section">
+        <strong>Overall Result:</strong> <span class="pass">PASS</span> (10/10 tests passed)
+      </div>
+    </div>
+  </body>
+</html>

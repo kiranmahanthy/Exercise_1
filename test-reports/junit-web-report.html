@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JUnit Test Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #1f2937; }
+    .container { max-width: 1200px; margin: 32px auto; padding: 0 20px 40px; }
+    .header { background: linear-gradient(135deg, #0f172a, #1d4ed8); color: white; padding: 24px 28px; border-radius: 12px; box-shadow: 0 8px 20px rgba(15,23,42,.12); }
+    h1 { margin: 0 0 8px; font-size: 2rem; }
+    .subtitle { opacity: 0.85; margin: 0; }
+    .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 24px 0; }
+    .card { background: white; border-radius: 12px; padding: 18px; box-shadow: 0 4px 10px rgba(15,23,42,.06); }
+    .card .label { font-size: 0.82rem; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
+    .card .value { margin-top: 8px; font-size: 2rem; font-weight: 700; }
+    .passed { color: #15803d; }
+    .failed { color: #b91c1c; }
+    .skipped { color: #a16207; }
+    .total { color: #1d4ed8; }
+    table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 4px 10px rgba(15,23,42,.06); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 12px 14px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
+    th { background: #eff6ff; color: #1e3a8a; font-size: 0.85rem; text-transform: uppercase; letter-spacing: .04em; }
+    .status { display: inline-block; padding: 5px 10px; border-radius: 999px; font-size: 0.8rem; font-weight: 700; }
+    .status.passed { background: #dcfce7; color: #166534; }
+    .status.failed { background: #fee2e2; color: #991b1b; }
+    .status.skipped { background: #fef3c7; color: #92400e; }
+    .failure { color: #991b1b; white-space: pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; }
+    .meta { color: #475569; font-size: 0.82rem; }
+    @media (max-width: 700px) {
+      table, thead, tbody, th, td, tr { display: block; }
+      th { display: none; }
+      td { border: none; border-bottom: 1px solid #e5e7eb; }
+      tr { padding: 10px 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>JUnit Test Report</h1>
+      <p class="subtitle">Generated from checkout pricing validation results</p>
+    </div>
+
+    <div class="summary">
+      <div class="card"><div class="label">Total</div><div class="value total">10</div></div>
+      <div class="card"><div class="label">Passed</div><div class="value passed">10</div></div>
+      <div class="card"><div class="label">Failed</div><div class="value failed">0</div></div>
+      <div class="card"><div class="label">Skipped</div><div class="value skipped">0</div></div>
+      <div class="card"><div class="label">Duration (s)</div><div class="value">0.01</div></div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Test Case</th>
+          <th>Class</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) subtotal = sum(price * quantity) and no other rules</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) subtotal = sum(price * quantity) and no other rules</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) percent coupon applies to whole order when categories empty</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) percent coupon applies to whole order when categories empty</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) percent coupon with categories applies only to matching items</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) percent coupon with categories applies only to matching items</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) coupon only applies if subtotal &gt;= minSubtotal</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) coupon only applies if subtotal &gt;= minSubtotal</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) fixed coupon subtracts from running total but never below 0</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) fixed coupon subtracts from running total but never below 0</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) member discount (5%) applies after coupon</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) member discount (5%) applies after coupon</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) tax of 8% applied after coupon + member discount</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) tax of 8% applied after coupon + member discount</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) loyalty redemption applies last (100 points = $1) and cannot reduce below zero</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) loyalty redemption applies last (100 points = $1) and cannot reduce below zero</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) rounding to 2 decimals is enforced</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) rounding to 2 decimals is enforced</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+        <tr>
+          <td><strong>Checkout pricing SPEC (source of truth) complex combined scenario runs rules in exact order</strong></td>
+          <td><span class="meta">Checkout pricing SPEC (source of truth) complex combined scenario runs rules in exact order</span></td>
+          <td>0.00s</td>
+          <td><span class="status passed">Passed</span></td>
+          <td><span class="meta">No failures recorded.</span></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
