@@ -1,3 +1,6 @@
+const hasDocument = typeof document !== 'undefined';
+const hasStorage = typeof localStorage !== 'undefined';
+
 const order = {
   items: [
     { name: 'Wireless Mouse', category: 'electronics', price: 0, quantity: 0 },
@@ -38,7 +41,7 @@ const DEFAULT_PRODUCTS = JSON.parse(JSON.stringify(PRODUCTS_BY_CATEGORY));
 const PRICE_PRESETS = [0, 5, 10, 15, 20, 25, 50, 100];
 const RECENT_PRICES = [];
 
-const elements = {
+const elements = hasDocument ? {
   itemsTableBody: document.querySelector('#items-table tbody'),
   addItem: document.querySelector('#add-item'),
   couponType: document.querySelector('#coupon-type'),
@@ -57,16 +60,17 @@ const elements = {
   summaryMember: document.querySelector('#summary-member'),
   summaryTax: document.querySelector('#summary-tax'),
   summaryLoyalty: document.querySelector('#summary-loyalty'),
-  summaryTotal: document.querySelector('#summary-total')
-  ,clearRecentPrices: document.querySelector('#clear-recent-prices')
-  ,clearCustomProducts: document.querySelector('#clear-custom-products')
-  ,confirmModal: document.querySelector('#confirm-modal')
-  ,confirmModalMessage: document.querySelector('#confirm-modal-message')
-  ,confirmModalConfirm: document.querySelector('#confirm-modal-confirm')
-  ,confirmModalCancel: document.querySelector('#confirm-modal-cancel')
-};
+  summaryTotal: document.querySelector('#summary-total'),
+  clearRecentPrices: document.querySelector('#clear-recent-prices'),
+  clearCustomProducts: document.querySelector('#clear-custom-products'),
+  confirmModal: document.querySelector('#confirm-modal'),
+  confirmModalMessage: document.querySelector('#confirm-modal-message'),
+  confirmModalConfirm: document.querySelector('#confirm-modal-confirm'),
+  confirmModalCancel: document.querySelector('#confirm-modal-cancel')
+} : {};
 
 function loadProducts() {
+  if (!hasStorage) return;
   try {
     const raw = localStorage.getItem('products_by_category');
     if (!raw) return;
@@ -82,6 +86,7 @@ function loadProducts() {
 }
 
 function saveProducts() {
+  if (!hasStorage) return;
   try {
     localStorage.setItem('products_by_category', JSON.stringify(PRODUCTS_BY_CATEGORY));
   } catch (e) {
@@ -162,6 +167,7 @@ async function clearCustomProducts() {
 }
 
 function loadRecentPrices() {
+  if (!hasStorage) return;
   try {
     const raw = localStorage.getItem('recent_prices');
     if (!raw) return;
@@ -177,6 +183,7 @@ function loadRecentPrices() {
 }
 
 function saveRecentPrices() {
+  if (!hasStorage) return;
   try {
     const unique = Array.from(new Set(RECENT_PRICES)).slice(0, 10);
     localStorage.setItem('recent_prices', JSON.stringify(unique));
@@ -291,6 +298,7 @@ function parseCategories(value) {
 }
 
 function clearErrorStates() {
+  if (!hasDocument) return;
   document.querySelectorAll('.input-error').forEach((element) => {
     element.classList.remove('input-error');
   });
@@ -673,6 +681,7 @@ function setupEventListeners() {
 }
 
 function initialize() {
+  if (!hasDocument) return;
   loadProducts();
   loadRecentPrices();
   renderItems();
@@ -680,4 +689,11 @@ function initialize() {
   updateSummary();
 }
 
-initialize();
+if (hasDocument) {
+  initialize();
+}
+
+// Export computePricing for test environments (Node/Jest)
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { computePricing };
+}
